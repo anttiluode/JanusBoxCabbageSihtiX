@@ -85,8 +85,9 @@ Windows, Python 3.13:
 
 ```
 py -3.13 -m pip install -r requirements.txt
-py -3.13 -m pytest -q tests            # 10 tests, ~15 s
+py -3.13 -m pytest -q tests            # 14 tests, ~20 s
 py -3.13 experiment.py                 # ~4 min on CPU -> results/receipt.json, results/weights.json
+py -3.13 moe_experiment.py             # ~50 min on CPU -> results/moe_receipt.json
 py -3.13 figure.py                     # results/figure.png
 py -3.13 build.py                      # index.html (embeds web/jbx.js, weights, 4 held-out crops)
 node tests/test_js.js                  # browser core vs Python core (agree to ~1e-11)
@@ -94,17 +95,56 @@ node tests/test_js.js                  # browser core vs Python core (agree to ~
 
 On Linux or macOS use `python3` in place of `py -3.13`. No GPU is used. Everything is NumPy FFTs and normal equations.
 
+## Round 2: let the flashlight choose the translator (`moe_experiment.py`)
+
+The flashlight now also picks *which* translator to use. It reads five contrast-free texture measures from the blurred input, each a Gaussian local average with σ = 8 px:
+
+* **agree:** phase agreement between parent and grandparent.
+* **orient:** how oriented the patch is.
+* **slope:** parent/grandparent energy slope.
+* **level:** local energy relative to the whole image.
+* **peaky:** edge versus texture, a 4th/2nd moment of |p|.
+
+k-means on training pixels gives G texture centres, and each pixel gets soft gates. A second new writer, **bend then EQ**, gives every translator feature its own small dark-zone filter: 4 radial tents, each with a zero-phase version and a quadrature version along the feature's orientation. Both writers are still closed-form least squares. Receipt: `results/moe_receipt.json`. Run time: 48 min on 2 CPU cores.
+
+Dark-band R² on the same held-out sets as above. Trained on photos unless marked.
+
+| writer | weights | photo test | photo crops > 0 | edge test | photo twins | photo, parent shifted | photo, parent from next image |
+|---|---|---|---|---|---|---|---|
+| flashlight + odd (round 1) | 32 | +0.053 | 9/11 | +0.312 | −0.011 | −0.041 | −0.039 |
+| texture-gated, G = 3 | 96 | +0.055 | 8/11 | +0.384 | −0.009 | −0.053 | −0.054 |
+| texture-gated, G = 6 | 192 | +0.055 | 9/11 | +0.426 | −0.010 | −0.065 | −0.070 |
+| texture-gated, G = 12 | 384 | +0.050 | 8/11 | +0.479 | −0.019 | −0.079 | −0.084 |
+| G = 6, gates read from **another image** (capacity control) | 192 | +0.039 | 7/11 | +0.254 | −0.014 | −0.056 | −0.054 |
+| **bend then EQ**, G = 1 | 256 | **+0.066** | 8/11 | +0.480 | −0.015 | −0.065 | −0.062 |
+| bend then EQ, trained on photos + edges | 256 | +0.021 | 4/11 | **+0.767** | −0.088 | −0.243 | −0.251 |
+| texture-gated G = 6, trained on photos + edges | 192 | −0.033 | 3/11 | +0.706 | −0.063 | −0.267 | −0.306 |
+
+How much of a photo's dark band could a readout like this explain at all? To find out, fit on 2/3 of a test crop's own pixels and score the other 1/3. Medians over the 11 photo crops:
+
+| within-image ceiling | median | range |
+|---|---|---|
+| flashlight + odd (32 weights) | 0.088 | 0.005 to 0.40 |
+| texture-gated G = 12 (384) | 0.151 | 0.03 to 0.45 |
+| bend then EQ (256) | 0.138 | 0.01 to 0.45 |
+| every feature at 9 offsets ±3 px (288) | 0.171 | 0.02 to 0.47 |
+
+### Verdict
+
+1. **Texture gating does not move photos.** The score goes from 0.053 to 0.055 with 3 or 6 experts, and to 0.050 with 12. On edge scenes the same gating helps a lot (0.312 → 0.479), so the gates work, just not where the problem is. Texture gates beat gates read from another image (0.055 vs 0.039 on photos, 0.426 vs 0.254 on edges), so the texture measures carry real information. It is not just extra capacity, but on photos there is little to gain.
+2. **Bend then EQ is the best photo writer**, at +0.066. It is also the best writer for mixed training: +0.767 on edges, and above zero on photos (+0.021) where round 1's mixed writer was at −0.005.
+3. **The kill tests still hold.** Every writer falls below zero on phase twins, on a shifted parent and on a parent taken from another image. The gate-shift control (`receipt.json`) collapses to between −17 and −520. The experts use large opposite-sign weights that only cancel when the gate sits on the right texture, so the gated writers are fragile.
+4. **So, is a photo's dark zone recoverable from one octave below?** Not by local readouts of the parent and grandparent. Fitted on each photo's own pixels with 288 weights, they still explain a median of only 17% of the dark band. Out of sample the best is 7%. Most of the detail above 0.25 cycles/pixel in these photos (fur, hair, grain, foliage, sensor noise) is not a fixed function of the local analytic coefficients one octave down. What this does *not* show: that the detail is unrecoverable by any method. Learned super-resolution uses wide context and priors learned from millions of images, which is a different instrument. This ledger only covers the flashlight and translator family, and for photos that family has reached its ceiling.
+
 ## Files
 
 * `jbx/bands.py`: the fixed geometry. 256→512 mirror extension, fine, parent and grandparent bands, dark zone, K = 4 one-sided steerable windows.
 * `jbx/writers.py`: the feature dictionary (odd, even, gated), the radial EQ basis, Gram accumulation.
+* `jbx/moe.py`: texture descriptors, soft k-means gates, gated columns, and bend-then-EQ filters.
 * `jbx/reader.py`: the outside reader.
 * `jbx/data.py`: photo crops, edge world, phase twins.
-* `experiment.py`: train, test, controls, reader → `results/`.
-* `web/jbx.js` + `web/template.html` → `index.html`: the live page. Buttons: negate, phase twin, shift parent, choice of training world, load your own image.
-
-## Next rung
-
-The reader says where to climb: photos need a writer whose output is not a fixed function of the local parent phase. The cheapest next test is to let the flashlight select among a few translators by local texture statistics (a mixture of experts on the same dictionary), then re-run the same twin and shift controls. If that does not move photos above zero, the dark zone of a photograph is not recoverable from one octave below, and the ledger should say so.
+* `experiment.py`: round 1. Train, test, controls, reader → `results/receipt.json`, `results/weights.json`.
+* `moe_experiment.py`: round 2 → `results/moe_receipt.json`, `results/moe_weights.json`.
+* `web/jbx.js` + `web/template.html` → `index.html`: the live page (round 1 writers). Buttons: negate, phase twin, shift parent, choice of training world, load your own image.
 
 Built by Claude (Opus 5.5) on the bands from SighImageX, BlackBoxSpotlight (Astra) and SighImageInverse (Sol).
