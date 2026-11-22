@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JanusBox Flashlight Translator</title>
+<style>
+:root { --bg:#f6f5f1; --fg:#1d1d1b; --mute:#6b6a64; --line:#d8d6cf; --card:#fffefa; --acc:#b4462b; --good:#2f6f4f; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#141413; --fg:#ecebe6; --mute:#9b9a93; --line:#33322e; --card:#1c1c1a; --acc:#e07a5c; --good:#77c19a; } }
+:root[data-theme="dark"] { --bg:#141413; --fg:#ecebe6; --mute:#9b9a93; --line:#33322e; --card:#1c1c1a; --acc:#e07a5c; --good:#77c19a; }
+* { box-sizing:border-box }
+body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width:1180px; margin:0 auto; padding:24px 16px 64px; }
+h1 { font-size:24px; margin:0 0 4px; letter-spacing:-.01em }
+p.lede { color:var(--mute); margin:0 0 18px; max-width:820px }
+.bar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:10px 0 18px; }
+button, select, label.file { font:inherit; font-size:14px; padding:6px 11px; border:1px solid var(--line); background:var(--card); color:var(--fg); border-radius:6px; cursor:pointer; }
+button.on { border-color:var(--acc); color:var(--acc); }
+input[type=file] { display:none }
+.grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:12px; }
+figure { margin:0; background:var(--card); border:1px solid var(--line); border-radius:8px; padding:8px; }
+figure canvas { width:100%; aspect-ratio:1; image-rendering:pixelated; display:block; border-radius:4px; background:#000 }
+figcaption { font-size:13px; margin-top:6px; }
+figcaption b { display:block; font-weight:600 }
+figcaption span { color:var(--mute) }
+.score { font-variant-numeric:tabular-nums; }
+h2 { font-size:16px; margin:26px 0 8px }
+.note { color:var(--mute); font-size:13px; max-width:860px }
+#status { color:var(--mute); font-size:13px; }
+table { border-collapse:collapse; font-size:13px; font-variant-numeric:tabular-nums; }
+td, th { padding:3px 10px 3px 0; text-align:left; border-bottom:1px solid var(--line); }
+</style>
+</head>
+<body>
+<main>
+<h1>Flashlight + translator</h1>
+<p class="lede">The input is blurred so that nothing above 0.25 cycles/pixel survives. Any Fourier gain on that input writes exactly zero there. The writers below regrow that dark band from the octave below: the amplitude of the parent band says <i>where</i> (flashlight), its phase says <i>what</i> (translator). All weights were fitted offline by least squares and are embedded in this page. Honest result: on hard-edged scenes it regrows most of the dark band; on held-out photographs it does not beat writing nothing.</p>
+
+<div class="bar">
+  <select id="sample"></select>
+  <button id="edge">New edge scene</button>
+  <label class="file">Load image…<input type="file" id="file" accept="image/*"></label>
+  <select id="world" title="training world of the weights"></select>
+  <span style="flex:1"></span>
+  <button id="neg">Negate input</button>
+  <button id="twin">Phase twin</button>
+  <button id="wrong">Shift parent (64, 96 px)</button>
+</div>
+<div id="status">computing…</div>
+
+<h2>Images (crop 256 × 256)</h2>
+<div class="grid" id="imgs"></div>
+<h2>Dark band only (r ≥ 0.25 cycles/pixel), common gray scale</h2>
+<div class="grid" id="darks"></div>
+<h2>What the flashlight sees</h2>
+<div class="grid" id="looks"></div>
+<p class="note">Scores are R² on the 208 × 208 interior, against the true band. Dark-band R² = 0 means "wrote nothing useful"; negative means it wrote the wrong thing. Controls: <b>negate</b> flips the image — an odd writer flips with it and keeps its score, the even writer cannot. <b>Phase twin</b> keeps every Fourier magnitude and scrambles the phases, so cross-scale phase coupling is gone. <b>Shift parent</b> computes the features correctly but rolls them 64 × 96 pixels before writing.</p>
+<h2>Held-out ledger from <code>results/receipt.json</code></h2>
+<div id="ledger"></div>
+</main>
+<script>__JBX_JS__</script>
+<script>
+const DATA = __DATA__;
+const J = JBX, S = J.S, M = J.M;
+const state = { x: null, neg: false, twin: false, wrong: false, world: 'mixed', label: '' };
+const $ = id => document.getElementById(id);
+
+function pngToGray(src) {
+  return new Promise(res => { const im = new Image(); im.onload = () => {
+    const c = document.createElement('canvas'); c.width = S; c.height = S; const g = c.getContext('2d');
+    const s = Math.min(im.width, im.height); g.drawImage(im, (im.width - s) / 2, (im.height - s) / 2, s, s, 0, 0, S, S);
+    const d = g.getImageData(0, 0, S, S).data, x = new Float64Array(S * S); let m = 0;
+    for (let n = 0; n < S * S; n++) { x[n] = (0.2125 * d[4 * n] + 0.7154 * d[4 * n + 1] + 0.0721 * d[4 * n + 2]) / 255; m += x[n]; }
+    m /= S * S; for (let n = 0; n < S * S; n++) x[n] -= m; res(x); }; im.src = src; });
+}
+function panel(host, title, sub) {
+  const f = document.createElement('figure'), c = document.createElement('canvas'); c.width = S; c.height = S;
+  const cap = document.createElement('figcaption'); cap.innerHTML = `<b>${title}</b><span class="score">${sub}</span>`;
+  f.append(c, cap); host.append(f); return c.getContext('2d');
+}
+function draw(ctx, a, lo, hi, isExt = true) {
+  const im = ctx.createImageData(S, S);
+  for (let i = 0; i < S; i++) for (let j = 0; j < S; j++) {
+    const v = a[isExt ? i * M + j : i * S + j], g = Math.max(0, Math.min(255, 255 * (v - lo) / (hi - lo))), n = 4 * (i * S + j);
+    im.data[n] = im.data[n + 1] = im.data[n + 2] = g; im.data[n + 3] = 255;
+  }
+  ctx.putImageData(im, 0, 0);
+}
+function drawRGB(ctx, f) { const im = ctx.createImageData(S, S);
+  for (let i = 0; i < S; i++) for (let j = 0; j < S; j++) { const [r, g, b] = f(i * M + j), n = 4 * (i * S + j); im.data[n] = r; im.data[n + 1] = g; im.data[n + 2] = b; im.data[n + 3] = 255; }
+  ctx.putImageData(im, 0, 0); }
+function hsv(h, v) { const k = n => (n + h * 6) % 6, f = n => v * (1 - Math.max(0, Math.min(k(n), 4 - k(n), 1))); return [255 * f(5), 255 * f(3), 255 * f(1)]; }
+function range(a, q = 0.01) { const v = []; for (let i = 0; i < S; i += 2) for (let j = 0; j < S; j += 2) v.push(a[i * M + j]); v.sort((p, r) => p - r); return [v[Math.floor(q * v.length)], v[Math.floor((1 - q) * v.length) - 1]]; }
+const fmt = v => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(3);
+
+function run() {
+  if (!state.x) return;
+  $('status').textContent = 'computing…';
+  setTimeout(() => {
+    const t0 = performance.now();
+    let x = state.x;
+    if (state.twin) x = J.phaseTwin(x, 12345);
+    if (state.neg) x = x.map(v => -v);
+    const { y, t, td } = J.degrade(x), feat = J.features(y), W = DATA.weights[state.world];
+    const tf = state.wrong ? (a => J.roll(a, 64, 96)) : null;
+    const eq = J.writeEQ(feat.Y, W.eq);
+    const odd = J.writeDark(feat.F, W['flashlight + odd translator'], tf);
+    const even = J.writeDark(feat.F, W['even (sign-blind translator)'], tf);
+    const plain = J.writeDark(feat.F, W['odd translator, no flashlight'], tf);
+    const ext = J.extend(x), N = J.N;
+    const add = (...as) => { const o = new Float64Array(N); for (const a of as) for (let n = 0; n < N; n++) o[n] += a[n]; return o; };
+    const fine = (p) => { let e = 0, tt = 0; for (let i = J.MARGIN; i < S - J.MARGIN; i++) for (let j = J.MARGIN; j < S - J.MARGIN; j++) { const n = i * M + j, d = t[n] - p[n]; e += d * d; tt += t[n] * t[n]; } return 1 - e / tt; };
+    const zero = new Float64Array(N);
+    const [lo, hi] = range(ext, 0.005);
+    ['imgs', 'darks', 'looks'].forEach(id => $(id).innerHTML = '');
+    draw(panel($('imgs'), 'Blurred input', `fine band R² ${fmt(fine(zero))}`), y, lo, hi);
+    draw(panel($('imgs'), 'EQ only (magnitude)', `fine ${fmt(fine(eq))} · dark ${fmt(0)}`), add(y, eq), lo, hi);
+    draw(panel($('imgs'), 'EQ + even translator', `fine ${fmt(fine(add(eq, even)))}`), add(y, eq, even), lo, hi);
+    draw(panel($('imgs'), 'EQ + flashlight + odd', `fine ${fmt(fine(add(eq, odd)))}`), add(y, eq, odd), lo, hi);
+    draw(panel($('imgs'), 'Truth', state.label), ext, lo, hi);
+    const [dl, dh] = range(td, 0.005), m = Math.max(-dl, dh);
+    draw(panel($('darks'), 'True dark band', 'what was erased'), td, -m, m);
+    draw(panel($('darks'), 'Any EQ / SighImageX gain', `dark R² ${fmt(0)} (exactly zero)`), zero, -m, m);
+    draw(panel($('darks'), 'Even translator', `dark R² ${fmt(J.r2(even, td))}`), even, -m, m);
+    draw(panel($('darks'), 'Odd, no flashlight', `dark R² ${fmt(J.r2(plain, td))}`), plain, -m, m);
+    draw(panel($('darks'), 'Flashlight + odd', `dark R² ${fmt(J.r2(odd, td))}`), odd, -m, m);
+    // flashlight: amplitude-weighted pc^4; phase: hue of the strongest orientation
+    const amp = new Float64Array(N), light = new Float64Array(N), hue = new Float64Array(N);
+    for (let n = 0; n < N; n++) { let best = -1; for (let k = 0; k < J.K; k++) { const [pr, pi] = feat.P[k], a = Math.hypot(pr[n], pi[n]); amp[n] += a; light[n] += a * feat.pcs[k][n]; if (a > best) { best = a; hue[n] = (Math.atan2(pi[n], pr[n]) / (2 * Math.PI) + 1) % 1; } } }
+    const [, ah] = range(amp, 0.002);
+    draw(panel($('looks'), 'Parent amplitude |p|', 'unsigned: where'), amp, 0, ah);
+    draw(panel($('looks'), 'Flashlight Σ|p|·pc⁴', 'cross-scale agreement'), light, 0, ah);
+    drawRGB(panel($('looks'), 'Parent phase arg p', 'hue = clock hand, brightness = |p|'), n => hsv(hue[n], Math.min(1, amp[n] / ah)));
+    $('status').textContent = `${state.label}${state.neg ? ' · negated' : ''}${state.twin ? ' · phase twin' : ''}${state.wrong ? ' · parent shifted' : ''} · weights trained on ${state.world} · ${(performance.now() - t0).toFixed(0)} ms`;
+  }, 20);
+}
+function ledger() {
+  const r = DATA.receipt, rows = Object.keys(r.writers.mixed);
+  let h = '<table><tr><th>writer (trained on mixed)</th><th>photo test</th><th>edge test</th><th>photo twins</th><th>edge twins</th></tr>';
+  for (const w of rows) { const v = r.writers.mixed[w]; h += `<tr><td>${w}</td>${['photo test', 'edge test', 'photo twins', 'edge twins'].map(k => `<td>${fmt(v[k])}</td>`).join('')}</tr>`; }
+  h += '<tr><td>any magnitude-only gain (SighImageX family)</td><td>+0.000</td><td>+0.000</td><td>+0.000</td><td>+0.000</td></tr></table>';
+  $('ledger').innerHTML = h + '<p class="note">Dark-band R² on held-out images (photos never seen in training; edge scenes from a different seed).</p>';
+}
+async function init() {
+  for (const n of Object.keys(DATA.samples)) $('sample').add(new Option(n, n));
+  for (const w of Object.keys(DATA.weights)) $('world').add(new Option('weights: ' + w, w));
+  $('world').value = 'mixed';
+  const load = async n => { state.x = await pngToGray(DATA.samples[n]); state.label = n; run(); };
+  $('sample').onchange = e => e.target.value && load(e.target.value);
+  $('world').onchange = e => { state.world = e.target.value; run(); };
+  let seed = 1; $('edge').onclick = () => { $('sample').value = ''; state.x = J.edgeScene(seed++); state.label = 'edge scene ' + (seed - 1); run(); };
+  $('file').onchange = e => { const f = e.target.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = async () => { state.x = await pngToGray(rd.result); state.label = f.name; run(); }; rd.readAsDataURL(f); };
+  for (const k of ['neg', 'twin', 'wrong']) $(k).onclick = () => { state[k] = !state[k]; $(k).classList.toggle('on', state[k]); run(); };
+  ledger(); $('sample').add(new Option('— pick a photo —', ''), 0); $('sample').value = ''; $('edge').click();
+}
+init();
+</script>
+</body>
+</html>

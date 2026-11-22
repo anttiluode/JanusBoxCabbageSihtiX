@@ -1,0 +1,976 @@
+{
+  "bands": {
+    "dark_zone": "r >= 0.25 cycles/px",
+    "parent_centre": 0.125,
+    "K": 4,
+    "size": 256,
+    "margin": 24
+  },
+  "counts": {
+    "train": {
+      "photo": 69,
+      "edge": 60,
+      "mixed": 129
+    },
+    "test": {
+      "photo test": 11,
+      "edge test": 20,
+      "photo twins": 11,
+      "edge twins": 20
+    }
+  },
+  "input_dark_energy_max": 8.20999192816181e-32,
+  "magnitude_only_dark_r2": 0.0,
+  "writers": {
+    "photo": {
+      "even (sign-blind translator)": {
+        "train_r2": 0.0020182167461156864,
+        "n_weights": 24,
+        "photo test": -0.0017301439720296408,
+        "edge test": -0.0019174194058821925,
+        "photo twins": -0.0017322807388133743,
+        "edge twins": -0.0018385863677192749
+      },
+      "odd translator, no flashlight": {
+        "train_r2": 0.008054045080291394,
+        "n_weights": 16,
+        "photo test": 0.02383310269659311,
+        "edge test": 0.17999607848293353,
+        "photo twins": -0.003237746836472155,
+        "edge twins": -0.004606897398788057
+      },
+      "flashlight + odd translator": {
+        "train_r2": 0.021801124858508047,
+        "n_weights": 32,
+        "photo test": 0.053157115380172315,
+        "edge test": 0.3121706331049281,
+        "photo twins": -0.010991694138531738,
+        "edge twins": -0.014220131863511565
+      },
+      "tripled clock hands only": {
+        "train_r2": 0.009328544228268565,
+        "n_weights": 16,
+        "photo test": 0.031782249094913784,
+        "edge test": 0.17613745852922436,
+        "photo twins": -0.007553138380550051,
+        "edge twins": -0.009733982877970115
+      }
+    },
+    "edge": {
+      "even (sign-blind translator)": {
+        "train_r2": 0.001883531848159592,
+        "n_weights": 24,
+        "photo test": -0.0013557072579388763,
+        "edge test": -0.0016438561354932268,
+        "photo twins": -0.0016327066067711726,
+        "edge twins": -0.001656748830613175
+      },
+      "odd translator, no flashlight": {
+        "train_r2": 0.4438193562091681,
+        "n_weights": 16,
+        "photo test": -0.06767605695213841,
+        "edge test": 0.432462069176358,
+        "photo twins": -0.07206613973669418,
+        "edge twins": -0.089102319995227
+      },
+      "flashlight + odd translator": {
+        "train_r2": 0.7517405249898514,
+        "n_weights": 32,
+        "photo test": -0.20475777239975823,
+        "edge test": 0.7460779319142714,
+        "photo twins": -0.47531367264859625,
+        "edge twins": -0.586376186628504
+      },
+      "tripled clock hands only": {
+        "train_r2": 0.6670885393522052,
+        "n_weights": 16,
+        "photo test": -0.19369613513743067,
+        "edge test": 0.6605211601452061,
+        "photo twins": -0.33225331187428275,
+        "edge twins": -0.4123897539823205
+      }
+    },
+    "mixed": {
+      "even (sign-blind translator)": {
+        "train_r2": 0.000801071398077946,
+        "n_weights": 24,
+        "photo test": -0.0003240581278802779,
+        "edge test": -0.0002317997052427856,
+        "photo twins": -0.000707013347055474,
+        "edge twins": -0.00051619595514385
+      },
+      "odd translator, no flashlight": {
+        "train_r2": 0.23400352923751888,
+        "n_weights": 16,
+        "photo test": -0.019618908246032962,
+        "edge test": 0.41607035255285096,
+        "photo twins": -0.026160452259424538,
+        "edge twins": -0.03484660922958405
+      },
+      "flashlight + odd translator": {
+        "train_r2": 0.3585174978049699,
+        "n_weights": 32,
+        "photo test": -0.004780670387170671,
+        "edge test": 0.6795707129242433,
+        "photo twins": -0.14190491507834468,
+        "edge twins": -0.18055285902717988
+      },
+      "tripled clock hands only": {
+        "train_r2": 0.29956391128031934,
+        "n_weights": 16,
+        "photo test": -0.041209368810509295,
+        "edge test": 0.6116443660564348,
+        "photo twins": -0.17315814608043634,
+        "edge twins": -0.2209678591826616
+      }
+    }
+  },
+  "eq": {
+    "photo": {
+      "weights": [
+        0.9874082082025639,
+        1.0618093013917178,
+        1.2882709442735565,
+        1.7393907177781842,
+        2.6278085523063526,
+        4.61261531646034,
+        10.006896179588708,
+        33.91696559295297,
+        331.0077568615632
+      ],
+      "knots": [
+        0.125,
+        0.140625,
+        0.15625,
+        0.171875,
+        0.1875,
+        0.203125,
+        0.21875,
+        0.234375,
+        0.25
+      ],
+      "photo test": 0.9463461547273525,
+      "edge test": 0.9549817597380034,
+      "photo twins": 0.945076543148156,
+      "edge twins": 0.9498880727868804
+    },
+    "edge": {
+      "weights": [
+        0.986789875397817,
+        1.060064690301354,
+        1.2886509668778419,
+        1.7398023828410176,
+        2.630896960193083,
+        4.6082366283263045,
+        10.030984947190756,
+        33.65386065695945,
+        341.7268913843006
+      ],
+      "knots": [
+        0.125,
+        0.140625,
+        0.15625,
+        0.171875,
+        0.1875,
+        0.203125,
+        0.21875,
+        0.234375,
+        0.25
+      ],
+      "photo test": 0.9462618077156475,
+      "edge test": 0.9549208344991278,
+      "photo twins": 0.9450697915609824,
+      "edge twins": 0.9497487268937901
+    },
+    "mixed": {
+      "weights": [
+        0.9870513014086002,
+        1.0607531678876925,
+        1.2884863646823823,
+        1.7396692045126962,
+        2.629620836796487,
+        4.610193023686751,
+        10.020410993596784,
+        33.76941509474058,
+        337.1149571440236
+      ],
+      "knots": [
+        0.125,
+        0.140625,
+        0.15625,
+        0.171875,
+        0.1875,
+        0.203125,
+        0.21875,
+        0.234375,
+        0.25
+      ],
+      "photo test": 0.9463220841954115,
+      "edge test": 0.9549688426613988,
+      "photo twins": 0.9450970704649295,
+      "edge twins": 0.9498320384099184
+    }
+  },
+  "controls": {
+    "photo": {
+      "rolled parent (64,96 px)": -0.041257393117563046,
+      "wrong parent (next image)": -0.03857052738478273,
+      "edge: rolled parent": -0.06213562568151998,
+      "edge: wrong parent": -0.0990043859573233
+    },
+    "edge": {
+      "rolled parent (64,96 px)": -0.5084667909704557,
+      "wrong parent (next image)": -0.5470080666646713,
+      "edge: rolled parent": -0.5590200986811957,
+      "edge: wrong parent": -0.762314762724625
+    },
+    "mixed": {
+      "rolled parent (64,96 px)": -0.24256111694475568,
+      "wrong parent (next image)": -0.25473928702669757,
+      "edge: rolled parent": -0.3175117180921432,
+      "edge: wrong parent": -0.46358972423137157
+    }
+  },
+  "flip": {
+    "photo": {
+      "even (sign-blind translator)": {
+        "photo: same image": -0.0017301439720296408,
+        "photo: negative image": -0.0021130719795534603,
+        "edge: same image": -0.0019174194058821925,
+        "edge: negative image": -0.003101509404361824
+      },
+      "odd translator, no flashlight": {
+        "photo: same image": 0.02383310269659311,
+        "photo: negative image": 0.02383310269659311,
+        "edge: same image": 0.17999607848293353,
+        "edge: negative image": 0.17999607848293353
+      },
+      "flashlight + odd translator": {
+        "photo: same image": 0.053157115380172315,
+        "photo: negative image": 0.053157115380172315,
+        "edge: same image": 0.3121706331049281,
+        "edge: negative image": 0.3121706331049281
+      },
+      "tripled clock hands only": {
+        "photo: same image": 0.031782249094913784,
+        "photo: negative image": 0.031782249094913784,
+        "edge: same image": 0.17613745852922436,
+        "edge: negative image": 0.17613745852922436
+      }
+    },
+    "edge": {
+      "even (sign-blind translator)": {
+        "photo: same image": -0.0013557072579388763,
+        "photo: negative image": -0.0016936231570467974,
+        "edge: same image": -0.0016438561354932268,
+        "edge: negative image": -0.001706700958330476
+      },
+      "odd translator, no flashlight": {
+        "photo: same image": -0.06767605695213841,
+        "photo: negative image": -0.06767605695213841,
+        "edge: same image": 0.432462069176358,
+        "edge: negative image": 0.432462069176358
+      },
+      "flashlight + odd translator": {
+        "photo: same image": -0.20475777239975823,
+        "photo: negative image": -0.20475777239975823,
+        "edge: same image": 0.7460779319142714,
+        "edge: negative image": 0.7460779319142714
+      },
+      "tripled clock hands only": {
+        "photo: same image": -0.19369613513743067,
+        "photo: negative image": -0.19369613513743067,
+        "edge: same image": 0.6605211601452061,
+        "edge: negative image": 0.6605211601452061
+      }
+    },
+    "mixed": {
+      "even (sign-blind translator)": {
+        "photo: same image": -0.0003240581278802779,
+        "photo: negative image": -0.000981425176902917,
+        "edge: same image": -0.0002317997052427856,
+        "edge: negative image": -0.0013090092029057754
+      },
+      "odd translator, no flashlight": {
+        "photo: same image": -0.019618908246032962,
+        "photo: negative image": -0.019618908246032962,
+        "edge: same image": 0.41607035255285096,
+        "edge: negative image": 0.41607035255285096
+      },
+      "flashlight + odd translator": {
+        "photo: same image": -0.004780670387170671,
+        "photo: negative image": -0.004780670387170671,
+        "edge: same image": 0.6795707129242433,
+        "edge: negative image": 0.6795707129242433
+      },
+      "tripled clock hands only": {
+        "photo: same image": -0.041209368810509295,
+        "photo: negative image": -0.041209368810509295,
+        "edge: same image": 0.6116443660564348,
+        "edge: negative image": 0.6116443660564348
+      }
+    }
+  },
+  "full_fine_band": {
+    "photo": {
+      "photo test": {
+        "blur (nothing added)": 0.0,
+        "EQ on what survived (magnitude-only)": 0.35418396038659883,
+        "EQ + flashlight/odd translator": 0.3874462438873083,
+        "dark share of fine-band energy": 0.6257352992693872
+      },
+      "edge test": {
+        "blur (nothing added)": 0.0,
+        "EQ on what survived (magnitude-only)": 0.3804884820281679,
+        "EQ + flashlight/odd translator": 0.5682825716937192,
+        "dark share of fine-band energy": 0.601575131516068
+      }
+    },
+    "edge": {
+      "photo test": {
+        "blur (nothing added)": 0.0,
+        "EQ on what survived (magnitude-only)": 0.3541523922775055,
+        "EQ + flashlight/odd translator": 0.22602822628720975,
+        "dark share of fine-band energy": 0.6257352992693872
+      },
+      "edge test": {
+        "blur (nothing added)": 0.0,
+        "EQ on what survived (magnitude-only)": 0.3804642078978815,
+        "EQ + flashlight/odd translator": 0.8292861379104455,
+        "dark share of fine-band energy": 0.601575131516068
+      }
+    },
+    "mixed": {
+      "photo test": {
+        "blur (nothing added)": 0.0,
+        "EQ on what survived (magnitude-only)": 0.3541749516361655,
+        "EQ + flashlight/odd translator": 0.35118351742074094,
+        "dark share of fine-band energy": 0.6257352992693872
+      },
+      "edge test": {
+        "blur (nothing added)": 0.0,
+        "EQ on what survived (magnitude-only)": 0.38048333554362057,
+        "EQ + flashlight/odd translator": 0.7892961765454903,
+        "dark share of fine-band energy": 0.601575131516068
+      }
+    }
+  },
+  "per_image_mixed_main": {
+    "photo test": [
+      [
+        "astronaut.png",
+        -0.06761173204012416
+      ],
+      [
+        "astronaut.png",
+        -0.8512601994644515
+      ],
+      [
+        "astronaut.png",
+        -0.05295847437622836
+      ],
+      [
+        "astronaut.png",
+        0.1303262267876889
+      ],
+      [
+        "coffee.png",
+        -0.029936263887897052
+      ],
+      [
+        "coffee.png",
+        -0.10242019177852946
+      ],
+      [
+        "chelsea.png",
+        -0.114839409671192
+      ],
+      [
+        "grace_hopper.jpg",
+        -0.05091032852753252
+      ],
+      [
+        "grace_hopper.jpg",
+        -0.03636125789370381
+      ],
+      [
+        "grace_hopper.jpg",
+        0.22766934879082035
+      ],
+      [
+        "grace_hopper.jpg",
+        0.2974902505823017
+      ]
+    ],
+    "edge test": [
+      [
+        "edge2_0",
+        0.6951046935880902
+      ],
+      [
+        "edge2_1",
+        0.6808902285382612
+      ],
+      [
+        "edge2_2",
+        0.7089618050114797
+      ],
+      [
+        "edge2_3",
+        0.7397746598620742
+      ],
+      [
+        "edge2_4",
+        0.6840570142310982
+      ],
+      [
+        "edge2_5",
+        0.7189079657593875
+      ],
+      [
+        "edge2_6",
+        0.6007487069884581
+      ],
+      [
+        "edge2_7",
+        0.663999691675478
+      ],
+      [
+        "edge2_8",
+        0.6680891432463061
+      ],
+      [
+        "edge2_9",
+        0.5898119610392161
+      ],
+      [
+        "edge2_10",
+        0.6799734096236825
+      ],
+      [
+        "edge2_11",
+        0.6280571755701029
+      ],
+      [
+        "edge2_12",
+        0.6595463606785554
+      ],
+      [
+        "edge2_13",
+        0.7368036503002586
+      ],
+      [
+        "edge2_14",
+        0.6931682129677388
+      ],
+      [
+        "edge2_15",
+        0.5702170073777232
+      ],
+      [
+        "edge2_16",
+        0.7053339010124483
+      ],
+      [
+        "edge2_17",
+        0.7085198996798797
+      ],
+      [
+        "edge2_18",
+        0.6479274729847249
+      ],
+      [
+        "edge2_19",
+        0.7140257458095248
+      ]
+    ],
+    "photo twins": [
+      [
+        "astronaut.png twin",
+        -0.16745168526537513
+      ],
+      [
+        "astronaut.png twin",
+        -0.2798783176122812
+      ],
+      [
+        "astronaut.png twin",
+        -0.14510326864563727
+      ],
+      [
+        "astronaut.png twin",
+        -0.17994929132204573
+      ],
+      [
+        "coffee.png twin",
+        -0.0506779740245904
+      ],
+      [
+        "coffee.png twin",
+        -0.1457594044160737
+      ],
+      [
+        "chelsea.png twin",
+        -0.08206907607710012
+      ],
+      [
+        "grace_hopper.jpg twin",
+        -0.2266019277111737
+      ],
+      [
+        "grace_hopper.jpg twin",
+        -0.1439124155915794
+      ],
+      [
+        "grace_hopper.jpg twin",
+        -0.13657684014546034
+      ],
+      [
+        "grace_hopper.jpg twin",
+        -0.11684332969878919
+      ]
+    ],
+    "edge twins": [
+      [
+        "edge2_0 twin",
+        -0.20689082691855143
+      ],
+      [
+        "edge2_1 twin",
+        -0.1706913843927056
+      ],
+      [
+        "edge2_2 twin",
+        -0.18738086855195069
+      ],
+      [
+        "edge2_3 twin",
+        -0.18918281299941597
+      ],
+      [
+        "edge2_4 twin",
+        -0.18524984049294568
+      ],
+      [
+        "edge2_5 twin",
+        -0.18332479918985856
+      ],
+      [
+        "edge2_6 twin",
+        -0.17511054081202593
+      ],
+      [
+        "edge2_7 twin",
+        -0.1882944084676641
+      ],
+      [
+        "edge2_8 twin",
+        -0.1834306437401778
+      ],
+      [
+        "edge2_9 twin",
+        -0.1618485858447114
+      ],
+      [
+        "edge2_10 twin",
+        -0.19006660434865785
+      ],
+      [
+        "edge2_11 twin",
+        -0.1825006290854032
+      ],
+      [
+        "edge2_12 twin",
+        -0.19273195184929315
+      ],
+      [
+        "edge2_13 twin",
+        -0.16262345857969507
+      ],
+      [
+        "edge2_14 twin",
+        -0.1723489891471255
+      ],
+      [
+        "edge2_15 twin",
+        -0.16411766123906668
+      ],
+      [
+        "edge2_16 twin",
+        -0.19180950037738254
+      ],
+      [
+        "edge2_17 twin",
+        -0.15764163928828467
+      ],
+      [
+        "edge2_18 twin",
+        -0.20730197744398438
+      ],
+      [
+        "edge2_19 twin",
+        -0.1823368027807566
+      ]
+    ]
+  },
+  "reader": {
+    "trained flashlight + odd": {
+      "input_dark_energy_frac": 7.822369504126838e-32,
+      "output_dark_energy_frac": 0.003682396155321349,
+      "creates_new_frequencies": true,
+      "additivity_error": 0.6031725864684853,
+      "parity": "odd",
+      "odd_error": 0.0,
+      "even_error": 2.0,
+      "recovered": {
+        "tri1*pc": -0.5306948234575336,
+        "tri3*pc": -0.5325716174832473,
+        "tri2*pc": -0.5921451141304372,
+        "clip0*pc": 1.038351039249412,
+        "tri1": 0.37284575775952583,
+        "tri3": 0.3705975264004422,
+        "pow21": -0.4434906335472191,
+        "pow21*pc": 0.3241625314942292,
+        "pow22": -0.48952740050601146,
+        "tri2": 0.3949411662414883,
+        "pow22*pc": 0.4037389029119978,
+        "pow23": -0.41232543431292745,
+        "pow23*pc": 0.31626842704127217,
+        "pow20": -0.42810556184966647,
+        "clip0": -0.09602849381872293,
+        "clip2*pc": 1.2657611001820004,
+        "clip1*pc": 1.44623091720316,
+        "clip3*pc": 1.1483158138783849,
+        "tri0*pc": -0.5401788997961301,
+        "tri0": 0.35956109605601805,
+        "pow20*pc": 0.39831559638134284,
+        "clip1": -0.22390481876424828,
+        "clip2": -0.19748337838531113,
+        "triI0": -0.0012157823965229255,
+        "triI2*pc": 0.004713084572553998,
+        "clip3": -0.09809802618420542,
+        "triI1": -0.008860213859110332,
+        "triI1*pc": 0.010433998315645855,
+        "triI0*pc": -0.0066554575069741025,
+        "triI3": 0.0005364193255313797,
+        "triI3*pc": 0.0011224544931563833,
+        "triI2": 0.0005299806806545968
+      },
+      "history": [
+        {
+          "added": "tri1*pc",
+          "heldout_residue": 0.5843330704485447
+        },
+        {
+          "added": "tri3*pc",
+          "heldout_residue": 0.35895246937324987
+        },
+        {
+          "added": "tri2*pc",
+          "heldout_residue": 0.29576480876871014
+        },
+        {
+          "added": "clip0*pc",
+          "heldout_residue": 0.24785620152896917
+        },
+        {
+          "added": "tri1",
+          "heldout_residue": 0.20177175883302398
+        },
+        {
+          "added": "tri3",
+          "heldout_residue": 0.1681913077984514
+        },
+        {
+          "added": "pow21",
+          "heldout_residue": 0.14598265731365792
+        },
+        {
+          "added": "pow21*pc",
+          "heldout_residue": 0.1080286437026998
+        },
+        {
+          "added": "pow22",
+          "heldout_residue": 0.09693058018411849
+        },
+        {
+          "added": "tri2",
+          "heldout_residue": 0.08570042873932296
+        },
+        {
+          "added": "pow22*pc",
+          "heldout_residue": 0.06458958784645169
+        },
+        {
+          "added": "pow23",
+          "heldout_residue": 0.05557795357086885
+        },
+        {
+          "added": "pow23*pc",
+          "heldout_residue": 0.04484992047481471
+        },
+        {
+          "added": "pow20",
+          "heldout_residue": 0.03622458728114191
+        },
+        {
+          "added": "clip0",
+          "heldout_residue": 0.029111491582041394
+        },
+        {
+          "added": "clip2*pc",
+          "heldout_residue": 0.02308220814214119
+        },
+        {
+          "added": "clip1*pc",
+          "heldout_residue": 0.018595181059940357
+        },
+        {
+          "added": "clip3*pc",
+          "heldout_residue": 0.0152482472293423
+        },
+        {
+          "added": "tri0*pc",
+          "heldout_residue": 0.013270754364216285
+        },
+        {
+          "added": "tri0",
+          "heldout_residue": 0.00856434052435551
+        },
+        {
+          "added": "pow20*pc",
+          "heldout_residue": 0.00037471205553942796
+        },
+        {
+          "added": "clip1",
+          "heldout_residue": 0.00024231554675350928
+        },
+        {
+          "added": "clip2",
+          "heldout_residue": 0.00015417527887085376
+        },
+        {
+          "added": "triI0",
+          "heldout_residue": 7.366084911018506e-05
+        },
+        {
+          "added": "triI2*pc",
+          "heldout_residue": 4.265713348849137e-05
+        },
+        {
+          "added": "clip3",
+          "heldout_residue": 2.371117736635862e-05
+        },
+        {
+          "added": "triI1",
+          "heldout_residue": 1.7059633501088847e-05
+        },
+        {
+          "added": "triI1*pc",
+          "heldout_residue": 8.172169123260119e-06
+        },
+        {
+          "added": "triI0*pc",
+          "heldout_residue": 2.109451262215774e-06
+        },
+        {
+          "added": "triI3",
+          "heldout_residue": 1.6698395074223555e-07
+        },
+        {
+          "added": "triI3*pc",
+          "heldout_residue": 7.482095674773304e-08
+        },
+        {
+          "added": "triI2",
+          "heldout_residue": 8.244305825986628e-15
+        }
+      ],
+      "unexplained_fraction": 8.244305825986628e-15,
+      "rung": "bend in the analytic band (odd translator)",
+      "weight_error_rel": 3.580476817954152e-13
+    },
+    "trained even (sign-blind)": {
+      "input_dark_energy_frac": 7.822369504126838e-32,
+      "output_dark_energy_frac": 8.901968903936412e-06,
+      "creates_new_frequencies": true,
+      "additivity_error": 0.7057734877788087,
+      "parity": "even",
+      "odd_error": 2.0000000000000004,
+      "even_error": 1.4408102398091875e-13,
+      "recovered": {
+        "dblI3*pc": -0.10884602755359576,
+        "dbl1": 0.04308301801604731,
+        "dbl0*pc": -0.057331490282856924,
+        "dblI1*pc": -0.04689015396968735,
+        "dblI2*pc": 0.057336334247853074,
+        "absb3*pc": -0.01090267381940218,
+        "dblI3": 0.04369669323482286,
+        "dblI0": 0.022900475607522463,
+        "absb2*pc": 0.05700343307182524,
+        "dblI2": -0.021112511765329096,
+        "dbl0": 0.02651764232633305,
+        "absb1*pc": 0.07574085181327814,
+        "dbl2*pc": -0.012921157095947374,
+        "absb1": -0.05723529746924256,
+        "dblI0*pc": -0.01039357100444984,
+        "dbl3": 0.0244577325725969,
+        "absb0*pc": 0.03283443367964679,
+        "absb0": -0.015611199250996284,
+        "dbl3*pc": -0.026972883236565118,
+        "absb3": -0.031005803076797716,
+        "dbl1*pc": -0.014643063206516585,
+        "dbl2": -0.008133608618520633,
+        "dblI1": 0.003921002609290829,
+        "absb2": 0.010237145820356331
+      },
+      "history": [
+        {
+          "added": "dblI3*pc",
+          "heldout_residue": 0.6200443776248514
+        },
+        {
+          "added": "dbl1",
+          "heldout_residue": 0.4843769608761753
+        },
+        {
+          "added": "dbl0*pc",
+          "heldout_residue": 0.37588761677196714
+        },
+        {
+          "added": "dblI1*pc",
+          "heldout_residue": 0.3148951318694072
+        },
+        {
+          "added": "dblI2*pc",
+          "heldout_residue": 0.16654334749604
+        },
+        {
+          "added": "absb3*pc",
+          "heldout_residue": 0.13885669698304395
+        },
+        {
+          "added": "dblI3",
+          "heldout_residue": 0.11539984272538362
+        },
+        {
+          "added": "dblI0",
+          "heldout_residue": 0.0917078933183657
+        },
+        {
+          "added": "absb2*pc",
+          "heldout_residue": 0.0693794872089946
+        },
+        {
+          "added": "dblI2",
+          "heldout_residue": 0.05243688787459703
+        },
+        {
+          "added": "dbl0",
+          "heldout_residue": 0.0371644731362015
+        },
+        {
+          "added": "absb1*pc",
+          "heldout_residue": 0.026445474094858583
+        },
+        {
+          "added": "dbl2*pc",
+          "heldout_residue": 0.020576083333192052
+        },
+        {
+          "added": "absb1",
+          "heldout_residue": 0.011476610228001265
+        },
+        {
+          "added": "dblI0*pc",
+          "heldout_residue": 0.008055240853369262
+        },
+        {
+          "added": "dbl3",
+          "heldout_residue": 0.0062656117787099
+        },
+        {
+          "added": "absb0*pc",
+          "heldout_residue": 0.004966678298703962
+        },
+        {
+          "added": "absb0",
+          "heldout_residue": 0.0037934683473721358
+        },
+        {
+          "added": "dbl3*pc",
+          "heldout_residue": 0.003058690520323642
+        },
+        {
+          "added": "absb3",
+          "heldout_residue": 0.0017193340880319095
+        },
+        {
+          "added": "dbl1*pc",
+          "heldout_residue": 0.0011703174540627149
+        },
+        {
+          "added": "dbl2",
+          "heldout_residue": 0.0006537067568344929
+        },
+        {
+          "added": "dblI1",
+          "heldout_residue": 0.0001908012330627973
+        },
+        {
+          "added": "absb2",
+          "heldout_residue": 5.536084866082895e-15
+        }
+      ],
+      "unexplained_fraction": 5.536084866082895e-15,
+      "rung": "bend in the analytic band (even translator)",
+      "weight_error_rel": 1.7907245746244636e-13
+    },
+    "hidden tripler (0.6 tri0, -0.4 triI2)": {
+      "input_dark_energy_frac": 7.822369504126838e-32,
+      "output_dark_energy_frac": 0.004340833606822005,
+      "creates_new_frequencies": true,
+      "additivity_error": 0.6674148611371686,
+      "parity": "odd",
+      "odd_error": 0.0,
+      "even_error": 2.0,
+      "recovered": {
+        "tri0": 0.6000000000000011,
+        "triI2": -0.399999999999997
+      },
+      "history": [
+        {
+          "added": "tri0",
+          "heldout_residue": 0.3382813401842182
+        },
+        {
+          "added": "triI2",
+          "heldout_residue": -1.3581794450806403e-15
+        }
+      ],
+      "unexplained_fraction": -1.3581794450806403e-15,
+      "rung": "bend in the analytic band (odd translator)",
+      "weight_error_rel": 4.4328784520941045e-15
+    },
+    "magnitude-only EQ": {
+      "input_dark_energy_frac": 7.822369504126838e-32,
+      "output_dark_energy_frac": 7.62016893263216e-32,
+      "creates_new_frequencies": false,
+      "rung": "EQ / linear filter: nothing written where the input is dark"
+    },
+    "flashlight with random phase": {
+      "input_dark_energy_frac": 7.822369504126838e-32,
+      "output_dark_energy_frac": 0.06863813036816759,
+      "creates_new_frequencies": true,
+      "additivity_error": 0.22543478835321232,
+      "parity": "even",
+      "odd_error": 2.0,
+      "even_error": 1.529698513496651e-15,
+      "recovered": {},
+      "history": [],
+      "unexplained_fraction": 1.0,
+      "rung": "writes new frequencies, but outside the dictionary (climb higher)"
+    }
+  },
+  "seconds": 226
+}
